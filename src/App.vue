@@ -1,12 +1,22 @@
-<script setup lang="ts">
-import HelloWorld from "./components/HelloWorld.vue";
-import ElAlert from "./components/alert/alert.vue";
-</script>
-
 <template>
-  <HelloWorld msg="Vite + Vue" />
-  <el-alert title="success alert" type="success" />
+  <ElInput
+    v-model="inputValue"
+    :placeholder="'请输入'"
+    @input="input"
+    :formatter="(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+    :parser="(value) => value.replace(/\$\s?|(,*)/g, '')"
+  />
 </template>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import ElInput from "./components/input/input.vue";
+const inputValue = ref<string | number>("测试");
+
+const input = (v) => {
+  console.log(v);
+};
+</script>
 
 <style scoped>
 .logo {

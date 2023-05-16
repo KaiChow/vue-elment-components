@@ -349,3 +349,44 @@ html:not(.dark) {
     background-color: var(--el-alert-bg-color);
     color: var(--el-color-success);
 }
+
+.el-input {
+    --el-input-height: var(--el-component-size);
+    position: relative;
+    font-size: var(--el-font-size-base);
+    display: inline-flex;
+    width: 100%;
+    line-height: var(--el-input-height);
+    box-sizing: border-box;
+    vertical-align: middle;
+}
+
+.el-input__wrapper {
+    display: inline-flex;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    padding: 1px 11px;
+    background-color: var(--el-input-bg-color, var(--el-fill-color-blank));
+    background-image: none;
+    border-radius: var(--el-input-border-radius, var(--el-border-radius-base));
+    transition: var(--el-transition-box-shadow);
+    transform: translateZ(0);
+    box-shadow: 0 0 0 1px var(--el-input-border-color, var(--el-border-color)) inset;
+}
+
+.el-input__inner {
+    --el-input-inner-height: calc(var(--el-input-height, 32px) - 2px);
+    width: 100%;
+    flex-grow: 1;
+    -webkit-appearance: none;
+    color: var(--el-input-text-color, var(--el-text-color-regular));
+    font-size: inherit;
+    height: var(--el-input-inner-height);
+    line-height: var(--el-input-inner-height);
+    padding: 0;
+    outline: none;
+    border: none;
+    background: none;
+    box-sizing: border-box;
+}
