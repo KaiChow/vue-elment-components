@@ -5,16 +5,15 @@
         ref="input"
         :class="ns.e('inner')"
         :type="type"
-        v-model="nativeValue"
         :placeholder="placeholder"
         :disabled="disabled"
-        @input="onInput"
+        @input="handleInput"
       />
     </div>
   </div>
 </template>
 <script setup lang="ts" name="ElInput">
-import { computed, ref, nextTick } from "vue";
+import { computed, ref, nextTick, watch, onMounted } from "vue";
 
 import { useNamespace } from "../../hooks/use-namespace";
 import { useCursor } from "../../hooks/use-cursor";
@@ -37,31 +36,48 @@ const ns = useNamespace("input");
 const input = ref();
 const [recordCursor, setCursor] = useCursor(input);
 
-const onInput = async (v) => {
-  recordCursor();
-  console.log(1);
-  emits("input", v.target.value);
-  await nextTick();
-  setCursor();
+const _ref = computed(() => input.value);
+
+const nativeInputValue = computed(() => props.modelValue);
+
+const setNativeInputValue = () => {
+  const input = _ref.value;
+  if (!input || input.value === nativeInputValue.value) return;
+  input.value = nativeInputValue.value;
 };
 
-const nativeValue = computed({
-  get: () => {
-    console.log("get");
-    if (props.formatter && props.parser) {
-      return props.formatter(props.modelValue);
-    }
-    return props.modelValue;
-  },
-  set: (v) => {
-    console.log("set");
-    if (props.formatter && props.parser) {
-      emits("update:modelValue", props.parser(v));
-      return;
-    }
-    emits("update:modelValue", v);
-  },
+watch(nativeInputValue, () => {
+  setNativeInputValue();
 });
+
+onMounted(() => {
+  setNativeInputValue();
+});
+
+const handleInput = async (event: Event) => {
+  recordCursor();
+
+  let { value } = event.target;
+
+  if (props.formatter) {
+    value = props.parser ? props.parser(value) : value;
+    emits("input", props.formatter(value));
+    emits("update:modelValue", props.formatter(value));
+  }
+
+  // hack for https://github.com/ElemeFE/element/issues/8548
+  // should remove the following line when we don't support IE
+  if (value === nativeInputValue.value) {
+    setNativeInputValue();
+    return;
+  }
+
+  // ensure native input value is controlled
+  // see: https://github.com/ElemeFE/element/issues/12850
+  await nextTick();
+  setNativeInputValue();
+  setCursor();
+};
 </script>
 
 <style lang="less" scoped></style>
