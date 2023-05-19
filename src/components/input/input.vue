@@ -9,6 +9,8 @@
         :disabled="disabled"
         @input="handleInput"
         @change="handleChange"
+        @focus="handleFocus"
+        @blur="handleBlur"
       />
     </div>
   </div>
@@ -32,7 +34,13 @@ const props = withDefaults(defineProps<PropsType>(), {
   disabled: false,
   type: "text",
 });
-const emits = defineEmits(["input", "update:modelValue", "change"]);
+const emits = defineEmits([
+  "input",
+  "update:modelValue",
+  "change",
+  "blur",
+  "focus",
+]);
 
 const ns = useNamespace("input");
 const input = ref();
@@ -75,6 +83,25 @@ const handleInput = async (event: Event) => {
 
 const handleChange = (event: Event) => {
   emits("change", (event.target as TargetElement).value);
+};
+const focused = ref(false);
+
+const focus = async () => {
+  // see: https://github.com/ElemeFE/element/issues/18573
+  await nextTick();
+  _ref.value?.focus();
+};
+
+const blur = () => _ref.value?.blur();
+
+const handleFocus = (event: FocusEvent) => {
+  focused.value = true;
+  emits("focus", event);
+};
+
+const handleBlur = (event: FocusEvent) => {
+  focused.value = false;
+  emits("blur", event);
 };
 </script>
 
