@@ -9,6 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vueuse/core": "^10.1.2",
+    "lodash": "^4.17.21",
+    "lodash-unified": "^1.0.3",
+    "nanoid": "^4.0.2",
     "vue": "^3.2.47"
   },
   "devDependencies": {
