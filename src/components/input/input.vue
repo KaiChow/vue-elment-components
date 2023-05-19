@@ -8,6 +8,7 @@
         :placeholder="placeholder"
         :disabled="disabled"
         @input="handleInput"
+        @change="handleChange"
       />
     </div>
   </div>
@@ -17,6 +18,7 @@ import { computed, ref, nextTick, watch, onMounted } from "vue";
 
 import { useNamespace } from "../../hooks/use-namespace";
 import { useCursor } from "../../hooks/use-cursor";
+type TargetElement = HTMLInputElement | HTMLTextAreaElement;
 type PropsType = {
   modelValue: string | number;
   placeholder: string;
@@ -30,7 +32,7 @@ const props = withDefaults(defineProps<PropsType>(), {
   disabled: false,
   type: "text",
 });
-const emits = defineEmits(["input", "update:modelValue"]);
+const emits = defineEmits(["input", "update:modelValue", "change"]);
 
 const ns = useNamespace("input");
 const input = ref();
@@ -56,27 +58,23 @@ onMounted(() => {
 
 const handleInput = async (event: Event) => {
   recordCursor();
-
-  let { value } = event.target;
-
+  let { value } = event.target as any;
   if (props.formatter) {
     value = props.parser ? props.parser(value) : value;
     emits("input", props.formatter(value));
     emits("update:modelValue", props.formatter(value));
   }
-
-  // hack for https://github.com/ElemeFE/element/issues/8548
-  // should remove the following line when we don't support IE
   if (value === nativeInputValue.value) {
     setNativeInputValue();
     return;
   }
-
-  // ensure native input value is controlled
-  // see: https://github.com/ElemeFE/element/issues/12850
   await nextTick();
   setNativeInputValue();
   setCursor();
+};
+
+const handleChange = (event: Event) => {
+  emits("change", (event.target as TargetElement).value);
 };
 </script>
 
